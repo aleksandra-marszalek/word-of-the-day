@@ -1,5 +1,6 @@
 package com.marszalek.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,4 @@ public class WordOfDay {
 
     @Getter(onMethod_ = @DynamoDbSortKey)
     private String date;
-
 }

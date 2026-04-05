@@ -79,6 +79,11 @@
             <artifactId>micronaut-serde-jackson</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.micronaut</groupId>
+            <artifactId>micronaut-retry</artifactId>
+            <version>${micronaut.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.micronaut.validation</groupId>
