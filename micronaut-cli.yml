@@ -1,0 +1,6 @@
+applicationType: function
+defaultPackage: com.marszalek
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [amazon-api-gateway-http, app-name, aws-lambda, aws-lambda-custom-runtime, aws-lambda-events-serde, aws-lambda-handler-apigateway-v2, graalvm, http-client, java, junit, logback, maven, maven-enforcer-plugin, micronaut-processing-compiler-args, properties, readme, redis-lettuce, serialization-jackson, shade, validation, x86]
