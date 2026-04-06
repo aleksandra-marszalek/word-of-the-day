@@ -1,0 +1,8 @@
+[
+  {
+    "name": "com.marszalek.model.WordOfDay",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  }
+]

@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Word of the Day API - Native Image
+
+Parameters:
+  RedisUri:
+    Type: String
+    NoEcho: true
+
+Globals:
+  Function:
+    Runtime: provided.al2023
+    Architectures:
+      - arm64
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        MICRONAUT_ENVIRONMENTS: prod
+        REDIS_URI: !Ref RedisUri
+
+Resources:
+  WordOfDayFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: io.micronaut.function.aws.runtime.MicronautLambdaRuntime
+      CodeUri: target/function.zip
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: word-of-the-day
+      Events:
+        GetWord:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/today
+            Method: get
+        PostGuess:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/guess
+            Method: post
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
