@@ -1,7 +1,9 @@
 package com.marszalek.service;
 
+import com.marszalek.dto.WordOfDayDTO;
 import com.marszalek.error.DefinitionFetchException;
 import com.marszalek.error.WordFetchException;
+import com.marszalek.error.WordNotFoundException;
 import com.marszalek.model.WordOfDay;
 import com.marszalek.repository.WordRepository;
 import io.micronaut.retry.annotation.Retryable;
@@ -62,5 +64,24 @@ public class WordOfDayServiceImpl implements WordOfDayService {
 
         log.info("Word Of Day Saved successfully: {}", wordOfDay.getWord());
         return wordOfDay;
+    }
+
+    @Override
+    public WordOfDayDTO getWordOfDay() {
+        var word = wordRepository.findByDate(LocalDate.now().toString())
+                .orElseGet(() -> wordRepository.findMostRecent()
+                        .orElseThrow(() -> new WordNotFoundException("No word of the day available")));
+
+        if (isBlank(word.getWord()) || isBlank(word.getDefinition())) {
+            throw new WordNotFoundException("Malformed word of the day received");
+        }
+
+        return new WordOfDayDTO(
+                word.getDate(),
+                word.getDefinition(),
+                word.getPartOfSpeech(),
+                word.getPhonetic(),
+                word.getAudioUrl(),
+                word.getWord().length());
     }
 }
