@@ -1,84 +1,99 @@
-## Micronaut 4.10.11 Documentation
+# Word of the Day API
 
-- [User Guide](https://docs.micronaut.io/4.10.11/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.10.11/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.10.11/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+A daily word challenge API built with Micronaut, AWS Lambda, DynamoDB, and Redis.
 
-## Handler
+Every day at 9am UTC a new word is fetched from a random word API, enriched with
+a full definition from the Dictionary API, and stored in DynamoDB. Users can fetch
+the word of the day and submit guesses.
 
-Handler: io.micronaut.function.aws.proxy.payload2.APIGatewayV2HTTPEventFunction
+## Tech Stack
 
-[AWS Lambda Handler](https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html)
+- **Micronaut** — framework with compile-time DI
+- **AWS Lambda** — serverless compute
+- **AWS DynamoDB** — persistent storage
+- **Redis (Upstash)** — caching layer
+- **GraalVM Native Image** — fast cold starts
 
-## Deployment with GraalVM
+## API Endpoints
 
-If you want to deploy to AWS Lambda as a GraalVM native image, run:
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/word/today` | Get today's word definition |
+| POST | `/api/v1/word/guess` | Submit a guess |
 
-```bash
-./mvnw package -Dpackaging=docker-native -Dmicronaut.runtime=lambda -Pgraalvm
+### Example responses
+
+`GET /api/v1/word/today`
+```json
+{
+  "date": "2026-04-06",
+  "definition": "lasting for a very short time",
+  "partOfSpeech": "adjective",
+  "phonetic": "/ɪˈfem.ər.əl/",
+  "audioUrl": "https://...",
+  "length": 9
+}
 ```
 
+`POST /api/v1/word/guess`
+```json
+{ "guess": "ephemeral" }
+```
+Response:
+```json
+{ "correct": true }
+```
 
-This will build the GraalVM native image inside a docker container and generate the `function.zip` ready for the deployment.
+## Running Locally
 
+### Prerequisites
+- Java 21 (Amazon Corretto)
+- Maven
+- Docker Desktop
+- AWS CLI configured
+- SAM CLI
 
-- [Micronaut Maven Plugin documentation](https://micronaut-projects.github.io/micronaut-maven-plugin/latest/)
-## Feature aws-lambda documentation
+### Start local Redis
+```bash
+docker run -d -p 6379:6379 redis:latest
+```
 
+### Build and run
+```bash
+./mvnw package -DskipTests
+sam local start-api --template sam.jvm.yml --warm-containers EAGER
+```
 
-- [Micronaut AWS Lambda Function documentation](https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambda)
+### Run tests
+```bash
+./mvnw test
+```
 
+## DynamoDB Schema
 
-## Feature maven-enforcer-plugin documentation
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| PK | String (partition key) | Always `"WORD"` |
+| SK | String (sort key) | Date `YYYY-MM-DD` |
+| word | String | The word |
+| definition | String | Primary definition |
+| partOfSpeech | String | e.g. noun, adjective |
+| phonetic | String | Phonetic spelling |
+| audioUrl | String | Pronunciation audio |
+| fetchedAt | String | ISO timestamp |
 
+## TODO — Future Improvements
 
-- [https://maven.apache.org/enforcer/maven-enforcer-plugin/](https://maven.apache.org/enforcer/maven-enforcer-plugin/)
-
-
-## Feature validation documentation
-
-
-- [Micronaut Validation documentation](https://micronaut-projects.github.io/micronaut-validation/latest/guide/)
-
-
-## Feature aws-lambda-custom-runtime documentation
-
-
-- [Micronaut Custom AWS Lambda runtime documentation](https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#lambdaCustomRuntimes)
-
-
-- [https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html)
-
-
-## Feature amazon-api-gateway-http documentation
-
-
-- [Micronaut Amazon API Gateway HTTP documentation](https://micronaut-projects.github.io/micronaut-aws/latest/guide/index.html#amazonApiGateway)
-
-
-- [https://docs.aws.amazon.com/apigateway/](https://docs.aws.amazon.com/apigateway/)
-
-
-## Feature serialization-jackson documentation
-
-
-- [Micronaut Serialization Jackson Core documentation](https://micronaut-projects.github.io/micronaut-serialization/latest/guide/)
-
-
-## Feature http-client documentation
-
-
-- [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#nettyHttpClient)
-
-
-## Feature aws-lambda-events-serde documentation
-
-
-- [Micronaut AWS Lambda Events Serde documentation](https://micronaut-projects.github.io/micronaut-aws/snapshot/guide/#eventsLambdaSerde)
-
-
-- [https://github.com/aws/aws-lambda-java-libs/tree/main/aws-lambda-java-events](https://github.com/aws/aws-lambda-java-libs/tree/main/aws-lambda-java-events)
-
-
+- [ ] Add `POST /word/admin` endpoint to manually trigger or override word of the day (can do it in the DB directly for now)
+- [ ] Introduce safe handling to edge cases:
+  - add `date` field to `GuessRequestDTO` to fix race condition at 9am when new word is fetched (TOCTOU issue)
+  - Add idempotency guard on scheduler (DynamoDB conditional write `attribute_not_exists(date)`) 
+- [ ] Add frontend (SvelteKit) 
+- [ ] Add API Gateway with custom domain
+  -  Consider adding rate limiting on guess endpoint to prevent brute force
+- [ ] Add history endpoint `GET /api/v1/word/history` // allow users to guess words from previous days
+- [ ] Consider splitting `WordOfDayService` into command/query
+  services (CQS pattern)
+- [ ] Switch Redis serialization from Java to JSON for better debuggability
+- [ ] Add additional hints for the user on guessing (how many letters correct, etc.)
+- [ ] Add Mockito as JVM agent to remove warning in test output
