@@ -6,6 +6,7 @@ target/
 out/
 .micronaut/
 .idea
+.env
 *.iml
 *.ipr
 *.iws
