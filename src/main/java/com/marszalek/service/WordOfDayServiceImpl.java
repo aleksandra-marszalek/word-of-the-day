@@ -6,6 +6,8 @@ import com.marszalek.error.WordFetchException;
 import com.marszalek.error.WordNotFoundException;
 import com.marszalek.model.WordOfDay;
 import com.marszalek.repository.WordRepository;
+import io.micronaut.cache.annotation.CacheInvalidate;
+import io.micronaut.cache.annotation.Cacheable;
 import io.micronaut.retry.annotation.Retryable;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ public class WordOfDayServiceImpl implements WordOfDayService {
     }
 
     @Retryable(attempts = "5", delay = "5s")
+    @CacheInvalidate(cacheNames = "wordofday")
     @Override
     public WordOfDay fetchAndStoreWordOfDay() {
         String randomWord = randomWordService.generateRandomWord();
@@ -85,7 +88,8 @@ public class WordOfDayServiceImpl implements WordOfDayService {
         return word.getWord().equalsIgnoreCase(guess);
     }
 
-    private WordOfDay getWordOfDay() {
+    @Cacheable(cacheNames = "wordofday")
+    protected WordOfDay getWordOfDay() {
         var word = wordRepository.findByDate(LocalDate.now().toString())
                 .orElseGet(() -> wordRepository.findMostRecent()
                         .orElseThrow(() -> new WordNotFoundException("No word of the day available")));

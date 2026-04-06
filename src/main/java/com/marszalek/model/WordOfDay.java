@@ -8,10 +8,12 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
+import java.io.Serializable;
+
 @DynamoDbBean
 @NoArgsConstructor
 @Data
-public class WordOfDay {
+public class WordOfDay implements Serializable {
 
     private String word;
     private String definition;
