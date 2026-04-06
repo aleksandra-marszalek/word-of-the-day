@@ -6,5 +6,7 @@ import com.marszalek.model.WordOfDay;
 public interface WordOfDayService {
     WordOfDay fetchAndStoreWordOfDay();
 
-    WordOfDayDTO getWordOfDay();
+    WordOfDayDTO getValidWordOfDay();
+
+    boolean checkGuess(String guess);
 }

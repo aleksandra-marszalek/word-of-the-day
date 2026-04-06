@@ -90,6 +90,10 @@
             <artifactId>micronaut-validation</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.micronaut</groupId>
+            <artifactId>micronaut-http-server</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>jakarta.validation</groupId>

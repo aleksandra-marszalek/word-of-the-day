@@ -67,14 +67,8 @@ public class WordOfDayServiceImpl implements WordOfDayService {
     }
 
     @Override
-    public WordOfDayDTO getWordOfDay() {
-        var word = wordRepository.findByDate(LocalDate.now().toString())
-                .orElseGet(() -> wordRepository.findMostRecent()
-                        .orElseThrow(() -> new WordNotFoundException("No word of the day available")));
-
-        if (isBlank(word.getWord()) || isBlank(word.getDefinition())) {
-            throw new WordNotFoundException("Malformed word of the day received");
-        }
+    public WordOfDayDTO getValidWordOfDay() {
+        var word = getWordOfDay();
 
         return new WordOfDayDTO(
                 word.getDate(),
@@ -83,5 +77,22 @@ public class WordOfDayServiceImpl implements WordOfDayService {
                 word.getPhonetic(),
                 word.getAudioUrl(),
                 word.getWord().length());
+    }
+
+    @Override
+    public boolean checkGuess(String guess) {
+        var word = getWordOfDay();
+        return word.getWord().equalsIgnoreCase(guess);
+    }
+
+    private WordOfDay getWordOfDay() {
+        var word = wordRepository.findByDate(LocalDate.now().toString())
+                .orElseGet(() -> wordRepository.findMostRecent()
+                        .orElseThrow(() -> new WordNotFoundException("No word of the day available")));
+
+        if (isBlank(word.getWord()) || isBlank(word.getDefinition())) {
+            throw new WordNotFoundException("Malformed word of the day received");
+        }
+        return word;
     }
 }
