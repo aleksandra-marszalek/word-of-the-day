@@ -116,3 +116,4 @@ sam local start-api --template sam.jvm.yml --warm-containers EAGER
   to fix runtime lambda generation incompatibility with GraalVM.
   This will reduce cold start from ~6s to ~100ms and cut memory usage in half.
   Use `sam.native.yml` with `provided.al2023` runtime and `arm64` architecture.
+- [ ] Fix random word API rate limiting on Lambda — either switch to another Api (API key based) or maintain internal word list in DynamoDB/S3

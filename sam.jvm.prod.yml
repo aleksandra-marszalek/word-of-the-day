@@ -18,7 +18,7 @@ Globals:
         REDIS_URI: !Ref RedisUri
 
 Resources:
-  WordOfDayFunction:
+  WordOfDayApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: com.marszalek.FunctionRequestHandler
@@ -37,6 +37,24 @@ Resources:
           Properties:
             Path: /api/v1/word/guess
             Method: post
+
+  WordOfDaySchedulerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.marszalek.SchedulerHandler
+      CodeUri: target/word-of-the-day-0.1.jar
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: word-of-the-day
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 9 * * ? *)
+            Name: word-of-the-day-scheduler
+            Description: Fetches and stores word of the day at 9am UTC
+            Enabled: true
 
 Outputs:
   ApiUrl:
