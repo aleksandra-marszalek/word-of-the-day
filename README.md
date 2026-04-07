@@ -10,21 +10,21 @@ the word of the day and submit guesses.
 
 - **Micronaut** — framework with compile-time DI
 - **AWS Lambda** — serverless compute
-- **AWS DynamoDB** — persistent storage
-- **Redis (Upstash)** — caching layer
-- **GraalVM Native Image** — fast cold starts (work in progress)
+- **AWS DynamoDB** — persistent storage (with Partition and Sort Keys supporting efficient search)
+- **Redis (Upstash)** — caching layer (reduces retrieval to ~50 ms)
+- **GraalVM Native Image** — super fast cold starts (<500 ms)
 
 ## Live API
 
-Base URL: `https://u0k4eygdch.execute-api.eu-west-1.amazonaws.com/Prod`
+Base URL: `https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/`
 
 ### Example requests
 ```bash
 # Get today's word
-curl https://YOUR_URL.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/today
+curl https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/today
 
 # Submit a guess
-curl -X POST https://YOUR_URL.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/guess \
+curl -X POST https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/guess \
   -H "Content-Type: application/json" \
   -d '{"guess": "your-word-here"}'
 ```
@@ -112,8 +112,4 @@ sam local start-api --template sam.jvm.yml --warm-containers EAGER
 - [ ] Switch Redis serialization from Java to JSON for better debuggability
 - [ ] Add additional hints for the user on guessing (how many letters correct, etc.)
 - [ ] Add Mockito as JVM agent to remove warning in test output
-- [ ] GraalVM native image — switch from `BeanTableSchema` to `StaticTableSchema`
-  to fix runtime lambda generation incompatibility with GraalVM.
-  This will reduce cold start from ~6s to ~100ms and cut memory usage in half.
-  Use `sam.native.yml` with `provided.al2023` runtime and `arm64` architecture.
 - [ ] Fix random word API rate limiting on Lambda — either switch to another Api (API key based) or maintain internal word list in DynamoDB/S3

@@ -3,7 +3,7 @@ package com.marszalek;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.marszalek.service.WordOfDayService;
-import io.micronaut.function.aws.proxy.payload1.ApiGatewayProxyRequestEventFunction;
+import io.micronaut.context.ApplicationContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -14,11 +14,8 @@ public class SchedulerHandler implements RequestHandler<Map<String, Object>, Map
     private final WordOfDayService wordOfDayService;
 
     public SchedulerHandler() {
-        // Bootstrap Micronaut context to get access to beans
-        var apiFunction = new ApiGatewayProxyRequestEventFunction();
-        this.wordOfDayService = apiFunction
-                .getApplicationContext()
-                .getBean(WordOfDayService.class);
+        var context = ApplicationContext.run();
+        this.wordOfDayService = context.getBean(WordOfDayService.class);
     }
 
     @Override
