@@ -6,6 +6,9 @@ Every day at 9am UTC a new word is fetched from a random word API, enriched with
 a full definition from the Dictionary API, and stored in DynamoDB. Users can fetch
 the word of the day and submit guesses.
 
+![Word of the Day Screenshot](screenshot.png)
+
+
 ## Tech Stack
 
 - **Micronaut** — framework with compile-time DI
@@ -14,9 +17,11 @@ the word of the day and submit guesses.
 - **Redis (Upstash)** — caching layer (reduces retrieval to ~50 ms)
 - **GraalVM Native Image** — super fast cold starts (<500 ms)
 
-## Live API
+## Live Demo
 
-Base URL: `https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/`
+You can now play the game [here](https://word-of-the-day-frontend.s3.eu-west-1.amazonaws.com/index.html). Enjoy!!
+
+Base URL for the BE Api: `https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/`
 
 ### Example requests
 ```bash
