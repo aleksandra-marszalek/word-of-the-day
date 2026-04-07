@@ -34,11 +34,21 @@ Resources:
           Properties:
             Path: /api/v1/word/today
             Method: get
+        GetWordOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/today
+            Method: options
         PostGuess:
           Type: Api
           Properties:
             Path: /api/v1/word/guess
             Method: post
+        PostGuessOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/guess
+            Method: options
 
   WordOfDaySchedulerFunction:
     Type: AWS::Serverless::Function
