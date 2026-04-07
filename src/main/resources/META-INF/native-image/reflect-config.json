@@ -4,5 +4,15 @@
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
+  },
+  {
+    "name": "com.marszalek.FunctionRequestHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.marszalek.SchedulerHandler",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
   }
 ]
