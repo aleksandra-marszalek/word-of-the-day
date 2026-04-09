@@ -6,6 +6,9 @@ Parameters:
   RedisUri:
     Type: String
     NoEcho: true
+  ApiNinjasKey:
+    Type: String
+    NoEcho: true
 
 Globals:
   Function:
@@ -18,6 +21,7 @@ Globals:
       Variables:
         MICRONAUT_ENVIRONMENTS: prod
         REDIS_URI: !Ref RedisUri
+        API_NINJAS_KEY: !Ref ApiNinjasKey
 
 Resources:
   WordOfDayFunction:
@@ -49,24 +53,26 @@ Resources:
           Properties:
             Path: /api/v1/word/guess
             Method: options
-
-  WordOfDaySchedulerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: com.marszalek.SchedulerHandler
-      CodeUri: target/function.zip
-      Timeout: 60
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: word-of-the-day
-      Events:
-        DailySchedule:
-          Type: Schedule
+        GetHint:
+          Type: Api
           Properties:
-            Schedule: cron(0 9 * * ? *)
-            Name: word-of-the-day-scheduler
-            Description: Fetches and stores word of the day at 9am UTC
-            Enabled: true
+            Path: /api/v1/word/hint
+            Method: get
+        GetHintOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/hint
+            Method: options
+        GetReveal:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/reveal
+            Method: get
+        GetRevealOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/reveal
+            Method: options
 
 Outputs:
   ApiUrl:

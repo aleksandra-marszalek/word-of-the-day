@@ -15,8 +15,7 @@ public class RandomWordServiceImpl implements RandomWordService {
 
     @Override
     public String generateRandomWord() {
-        return randomWordApiClient.getRandomWord()
-                .orElseThrow(() -> new WordFetchException("No random word found"))
-                .word();
+        return randomWordApiClient.getRandomWord().stream().findFirst()
+                .orElseThrow(() -> new WordFetchException("No random word found"));
     }
 }

@@ -1,5 +1,7 @@
 package com.marszalek.service;
 
+import com.marszalek.dto.HintDTO;
+import com.marszalek.dto.RevealDTO;
 import com.marszalek.dto.WordOfDayDTO;
 import com.marszalek.error.DefinitionFetchException;
 import com.marszalek.error.WordFetchException;
@@ -14,7 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Random;
 
+import static java.lang.String.valueOf;
 import static software.amazon.awssdk.utils.StringUtils.isBlank;
 import static software.amazon.awssdk.utils.StringUtils.isNotBlank;
 
@@ -32,7 +37,7 @@ public class WordOfDayServiceImpl implements WordOfDayService {
         this.wordRepository = wordRepository;
     }
 
-    @Retryable(attempts = "5", delay = "5s")
+    @Retryable(attempts = "5", delay = "5s", includes = {DefinitionFetchException.class, WordFetchException.class})
     @CacheInvalidate(cacheNames = "wordofday")
     @Override
     public WordOfDay fetchAndStoreWordOfDay() {
@@ -88,6 +93,21 @@ public class WordOfDayServiceImpl implements WordOfDayService {
         return word.getWord().equalsIgnoreCase(guess);
     }
 
+    @Override
+    public HintDTO getHint(List<Integer> revealedPositions) {
+        var word = getWordOfDay().getWord();
+
+        var random = getRandom(word.length(), revealedPositions);
+
+        return new HintDTO(random, valueOf(word.charAt(random)));
+    }
+
+    @Override
+    public RevealDTO reveal() {
+        var word = getWordOfDay();
+        return new RevealDTO(word.getWord());
+    }
+
     @Cacheable(cacheNames = "wordofday")
     protected WordOfDay getWordOfDay() {
         var word = wordRepository.findByDate(LocalDate.now().toString())
@@ -98,5 +118,18 @@ public class WordOfDayServiceImpl implements WordOfDayService {
             throw new WordNotFoundException("Malformed word of the day received");
         }
         return word;
+    }
+
+    private static int getRandom(int length, List<Integer> revealedPositions) {
+        if (revealedPositions.size() >= length) {
+            throw new WordNotFoundException("All positions already revealed");
+        }
+
+        var random = new Random().nextInt(length);
+
+        if (revealedPositions.contains(random)) {
+            return getRandom(length, revealedPositions);
+        }
+        return random;
     }
 }

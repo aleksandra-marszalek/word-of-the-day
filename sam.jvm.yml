@@ -30,3 +30,23 @@ Resources:
           Properties:
             Path: /api/v1/word/guess
             Method: post
+        GetHint:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/hint
+            Method: get
+        GetHintOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/hint
+            Method: options
+        GetReveal:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/reveal
+            Method: get
+        GetRevealOptions:
+          Type: Api
+          Properties:
+            Path: /api/v1/word/reveal
+            Method: options
