@@ -1,14 +1,16 @@
 package com.marszalek.client;
 
-import com.marszalek.dto.RandomWordResponseDTO;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
 import io.micronaut.http.client.annotation.Client;
 
+import java.util.List;
 import java.util.Optional;
 
-@Client(value = "https://random-words-api.vercel.app")
+@Client("https://api.api-ninjas.com")
 public interface RandomWordApiClient {
 
-    @Get(value = "/word")
-    Optional<RandomWordResponseDTO> getRandomWord();
+    @Get("/v2/randomword")
+    @Header(name = "X-Api-Key", value = "${api.ninjas.key}")
+    List<String> getRandomWord();
 }

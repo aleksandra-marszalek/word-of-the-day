@@ -32,7 +32,7 @@ public class WordOfDayServiceImpl implements WordOfDayService {
         this.wordRepository = wordRepository;
     }
 
-    @Retryable(attempts = "5", delay = "5s")
+    @Retryable(attempts = "5", delay = "5s", includes = {DefinitionFetchException.class, WordFetchException.class})
     @CacheInvalidate(cacheNames = "wordofday")
     @Override
     public WordOfDay fetchAndStoreWordOfDay() {
