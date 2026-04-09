@@ -1,14 +1,11 @@
 package com.marszalek.controller;
 
-import com.marszalek.dto.GuessRequestDTO;
-import com.marszalek.dto.GuessResponseDTO;
-import com.marszalek.dto.WordOfDayDTO;
+import com.marszalek.dto.*;
 import com.marszalek.service.WordOfDayService;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 @Controller("/api/v1/word")
 public class WordController {
@@ -27,5 +24,15 @@ public class WordController {
     @Post("/guess")
     public GuessResponseDTO guessWord(@Valid @Body GuessRequestDTO dto) {
         return new GuessResponseDTO(wordOfDayService.checkGuess(dto.guess()));
+    }
+
+    @Get("/hint")
+    public HintDTO getHint(@QueryValue List<Integer> revealed) {
+        return wordOfDayService.getHint(revealed);
+    }
+
+    @Get("/reveal")
+    public RevealDTO reveal() {
+        return wordOfDayService.reveal();
     }
 }
