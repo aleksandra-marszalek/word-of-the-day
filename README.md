@@ -2,9 +2,9 @@
 
 A daily word challenge API built with Micronaut, AWS Lambda, DynamoDB, and Redis.
 
-Every day at 9am UTC a new word is fetched from a random word API, enriched with
-a full definition from the Dictionary API, and stored in DynamoDB. Users can fetch
-the word of the day and submit guesses.
+Every day at 9am UTC a new word is fetched from API Ninja's [random word api](https://api-ninjas.com/api/randomword), enriched with
+a full definition from the [Dictionary API](https://dictionaryapi.dev/), and stored in DynamoDB. Users can fetch
+the word of the day and submit guesses, ask for the hints or reveal the word completely, if they're stuck.
 
 ![Word of the Day Screenshot](screenshot.png)
 
@@ -21,15 +21,15 @@ the word of the day and submit guesses.
 
 You can now play the game [here](https://word-of-the-day-frontend.s3.eu-west-1.amazonaws.com/index.html). Enjoy!!
 
-Base URL for the BE Api: `https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/`
+Base URL for the BE Api: `https://8lv1i6gga2.execute-api.eu-west-1.amazonaws.com/Prod`
 
 ### Example requests
 ```bash
 # Get today's word
-curl https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/today
+curl https://8lv1i6gga2.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/today
 
 # Submit a guess
-curl -X POST https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/guess \
+curl -X POST https://8lv1i6gga2.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/word/guess \
   -H "Content-Type: application/json" \
   -d '{"guess": "your-word-here"}'
 ```
@@ -40,6 +40,8 @@ curl -X POST https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/
 |--------|------|-------------|
 | GET | `/api/v1/word/today` | Get today's word definition |
 | POST | `/api/v1/word/guess` | Submit a guess |
+| GET | `/api/v1/word/hint` | Get a hint (reveals one letter position) |
+| GET | `/api/v1/word/reveal` | Reveal the full word answer |
 
 ### Example responses
 
@@ -62,6 +64,17 @@ curl -X POST https://bjxlu6rqt8.execute-api.eu-west-1.amazonaws.com/Prod/api/v1/
 Response:
 ```json
 { "correct": true }
+```
+
+`GET /api/v1/word/hint?revealed=0&revealed=3`
+```json
+{ "position": 5, "letter": "e" }
+```
+Pass already-revealed positions as query params to avoid duplicates.
+
+`GET /api/v1/word/reveal`
+```json
+{ "word": "ephemeral" }
 ```
 
 ## Running Locally
@@ -104,17 +117,10 @@ sam local start-api --template sam.jvm.yml --warm-containers EAGER
 
 ## TODO — Future Improvements
 
-- [ ] Add `POST /word/admin` endpoint to manually trigger or override word of the day (can do it in the DB directly for now)
-- [ ] Introduce safe handling to edge cases:
-  - add `date` field to `GuessRequestDTO` to fx race condition at 9am when new word is fetched (TOCTOU issue)
-  - Add idempotency guard on scheduler (DynamoDB conditional write `attribute_not_exists(date)`) 
-- [ ] Add frontend (SvelteKit) 
 - [ ] Add API Gateway with custom domain
   -  Consider adding rate limiting on guess endpoint to prevent brute force
 - [ ] Add history endpoint `GET /api/v1/word/history` // allow users to guess words from previous days
 - [ ] Consider splitting `WordOfDayService` into command/query
   services (CQS pattern)
 - [ ] Switch Redis serialization from Java to JSON for better debuggability
-- [ ] Add additional hints for the user on guessing (how many letters correct, etc.)
 - [ ] Add Mockito as JVM agent to remove warning in test output
-- [ ] Fix random word API rate limiting on Lambda — either switch to another Api (API key based) or maintain internal word list in DynamoDB/S3
