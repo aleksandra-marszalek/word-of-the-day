@@ -19,7 +19,7 @@ the word of the day and submit guesses, ask for the hints or reveal the word com
 
 ## Live Demo
 
-You can now play the game [here](https://word-of-the-day-frontend.s3.eu-west-1.amazonaws.com/index.html). Enjoy!!
+You can now play the game [here](https://wotd.aleksandramarszalek.co.uk/). Enjoy!!
 
 Base URL for the BE Api: `https://8lv1i6gga2.execute-api.eu-west-1.amazonaws.com/Prod`
 
