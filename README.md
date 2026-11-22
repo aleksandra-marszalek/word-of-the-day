@@ -3,7 +3,9 @@
 A daily word challenge API built with Micronaut, AWS Lambda, DynamoDB, and Redis.
 
 Every day at 9am UTC a new word is fetched from API Ninja's [random word api](https://api-ninjas.com/api/randomword), enriched with
-a full definition from the [Dictionary API](https://dictionaryapi.dev/), and stored in DynamoDB. Users can fetch
+a definition from [Wiktionary](https://en.wiktionary.org/api/rest_v1/) (falling back to [Datamuse](https://www.datamuse.com/api/)),
+and stored in DynamoDB. Phonetics and audio are added on a best-effort basis from the [Dictionary API](https://dictionaryapi.dev/),
+which is now behind a bot challenge and often unreachable from AWS, so they may be missing. Users can fetch
 the word of the day and submit guesses, ask for the hints or reveal the word completely, if they're stuck.
 
 ![Word of the Day Screenshot](screenshot.png)

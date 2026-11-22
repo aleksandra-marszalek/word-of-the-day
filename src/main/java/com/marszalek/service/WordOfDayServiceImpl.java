@@ -110,9 +110,15 @@ public class WordOfDayServiceImpl implements WordOfDayService {
 
     @Cacheable(cacheNames = "wordofday")
     protected WordOfDay getWordOfDay() {
-        var word = wordRepository.findByDate(LocalDate.now().toString())
-                .orElseGet(() -> wordRepository.findMostRecent()
-                        .orElseThrow(() -> new WordNotFoundException("No word of the day available")));
+        var today = LocalDate.now().toString();
+        var word = wordRepository.findByDate(today)
+                .orElseGet(() -> {
+                    var latest = wordRepository.findMostRecent()
+                            .orElseThrow(() -> new WordNotFoundException("No word of the day available"));
+                    // Surface a stalled daily job in the logs instead of silently serving an old word.
+                    log.error("No word stored for {}; serving most recent word from {}", today, latest.getDate());
+                    return latest;
+                });
 
         if (isBlank(word.getWord()) || isBlank(word.getDefinition())) {
             throw new WordNotFoundException("Malformed word of the day received");

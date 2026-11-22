@@ -27,7 +27,7 @@ Resources:
     Properties:
       Handler: com.marszalek.SchedulerHandler
       CodeUri: target/word-of-the-day-0.1.jar
-      Timeout: 60
+      Timeout: 120
       Policies:
         - DynamoDBCrudPolicy:
             TableName: word-of-the-day
