@@ -9,6 +9,9 @@ Parameters:
   ApiNinjasKey:
     Type: String
     NoEcho: true
+  AlertEmail:
+    Type: String
+    Description: Email address notified when the scheduler fails
 
 Globals:
   Function:
@@ -39,3 +42,29 @@ Resources:
             Name: word-of-the-day-scheduler
             Description: Fetches and stores word of the day at 9am UTC
             Enabled: true
+
+  SchedulerAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlertEmail
+
+  SchedulerErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: word-of-the-day-scheduler-errors
+      AlarmDescription: The daily word scheduler failed (all retries exhausted or timed out)
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref WordOfDaySchedulerFunction
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref SchedulerAlertTopic
